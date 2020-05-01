@@ -24,7 +24,8 @@ WHITE = (255, 255, 255)
 BLUE = (0, 0, 255)
 GREEN = (0, 255, 0)
 RED = (255, 0, 0)
-PURPLE = (210, 0, 200)
+PURPLE = (210, 100, 200)
+
 
 pt = np.array([0, 0])
 
@@ -44,6 +45,9 @@ clock = pygame.time.Clock()
 
 def drawPoint(pt, color='GREEN', thick=3, ):
     pygame.draw.circle(screen, color, pt, thick)
+
+def controlPoint(pt, color, ):
+    pygame.draw.rect(screen, color, (pt[0] - margin, pt[1] - margin, 2 * margin, 2 * margin), 5)
 
 
 # HW2 implement drawLine with drawPoint
@@ -70,7 +74,7 @@ def lagrange(pto, pt1, color, thick = 1):
                     xd = xd * (i - j)
             px = px + np.dot(pts[i], (xn)/ (xd))
         px = px.astype(int)
-        drawPoint(px, color=PURPLE, thick=1)
+        drawPoint(px, color, thick=1)
 
 
 
@@ -83,11 +87,13 @@ def drawPolylines(color='GREEN', thick=3):
         drawLine(pts[i], pts[i+1], GREEN)
         if button3 == True:
             #draws the lagrange curves
-            lagrange(pts[i], pts[i+1], RED)
+            lagrange(pts[i], pts[i+1], PURPLE)
         #deletes the last lines drawn
-        elif keypressed == pygame.K_KP_ENTER:
-            lagrange.fill(WHITE)
-            print("Space was pressed")
+        if event.type == pygame.KEYDOWN:
+            if event.key == pygame.K_KP_ENTER:
+                #screen.fill(WHITE)
+                lagrange(pts[i], pts[i + 1], WHITE)
+                i += -1
         #pygame.draw.line(screen, color, pts[i], pts[i + 1], thick)
 
 
@@ -124,17 +130,18 @@ while not done:
     if old_pressed == -1 and pressed == 1 and old_button1 == 1 and button1 == 0:
         pts.append(pt)
         count += 1
-        pygame.draw.rect(screen, BLUE, (pt[0] - margin, pt[1] - margin, 2 * margin, 2 * margin), 5)
+        controlPoint((pt[0] - margin, pt[1] - margin, 2 * margin, 2 * margin), BLUE)
         print("len:" + repr(len(pts)) + " mouse x:" + repr(x) + " y:" + repr(y) + " button:" + repr(
             button1) + " pressed:" + repr(pressed) + " add pts ...")
-    else:
+        # delete a circle
+        if event.type == pygame.KEYDOWN:
+            if event.key == pygame.K_z:
+                controlPoint((pt[0] - margin, pt[1] - margin, 2 * margin, 2 * margin), WHITE)
         print("len:" + repr(len(pts)) + " mouse x:" + repr(x) + " y:" + repr(y) + " button:" + repr(
             button1) + " pressed:" + repr(pressed))
 
     if len(pts) > 1:
         drawPolylines('GREEN', 1)
-    if keypressed == True:
-        print("key pressed: ", keypressed )
 
             #cp
         # drawLagrangePolylines(BLUE, 10, 3)
